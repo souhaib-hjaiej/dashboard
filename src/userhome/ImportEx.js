@@ -22,17 +22,32 @@ const ImportEx = ({ onDataImport }) => {
 
   return (
     <Button
-      variant="contained"
-      component="label"
-    >
-      Import Excel Data
-      <Input
-        type="file"
-        accept=".xlsx, .xls"
-        onChange={handleFileUpload}
-        sx={{ display: "none" }}
-      />
-    </Button>
+    variant="contained"
+    component="label"
+    sx={{
+      width: '50%', // Set width to 50% of the parent container
+      maxWidth: '200px', // Optional: Set a maximum width
+      padding: '8px 16px', // Adjust padding as needed
+      borderRadius: '8px', // Rounded corners
+      boxShadow: 3, // Add shadow for a more elevated look
+      textTransform: 'none', // Preserve original text case
+      '&:hover': {
+        backgroundColor: 'primary.dark', // Darker color on hover
+        boxShadow: 6, // Enhance shadow on hover
+      },
+      display: 'flex', // Ensures the content is centered
+      alignItems: 'center', // Aligns items vertically
+      justifyContent: 'center', // Centers content horizontally
+    }}
+  >
+    Import Excel Data
+    <Input
+      type="file"
+      accept=".xlsx, .xls"
+      onChange={handleFileUpload}
+      sx={{ display: 'none' }} // Hides the file input
+    />
+  </Button>
   );
 };
 

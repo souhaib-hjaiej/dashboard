@@ -1,21 +1,39 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Stack, FormControl, InputLabel, Select, MenuItem, Checkbox, ListItemText } from "@mui/material";
+import { 
+  TextField, 
+  Button, 
+  Stack, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Checkbox, 
+  ListItemText 
+} from "@mui/material";
+import { ajouterpus } from '../service/pus';
 
 const SimForm = ({ onSubmit, defaultValues = {} }) => {
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       numero: '',
-      typeUsage: [],
-      type: [],
+      typeUsage: '',
+      type: '', // Include the type field here
+      typeSIM: '', // Include the typeSIM field here
       quota: '',
-      ...defaultValues, // Utiliser les valeurs par défaut si disponibles
+      ...defaultValues, // Use default values if available
     },
   });
 
-  const submitHandler = (data) => {
-    onSubmit(data);
-    reset(); // Réinitialiser le formulaire après la soumission
+  const submitHandler = async (data) => {
+    console.log(data);
+    try {
+      await ajouterpus("http://localhost:3000/pus/add", data);
+      reset();
+      console.log('PUS added successfully');
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
@@ -35,17 +53,16 @@ const SimForm = ({ onSubmit, defaultValues = {} }) => {
             <FormControl fullWidth>
               <InputLabel>Type d'Usage</InputLabel>
               <Select
-                multiple
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
-                renderValue={(selected) => selected.join(', ')}
+                renderValue={(selected) => selected}
               >
                 <MenuItem value="personnelle">
-                  <Checkbox checked={field.value.includes("personnelle")} />
+                  <Checkbox checked={field.value === "personnelle"} />
                   <ListItemText primary="Personnelle" />
                 </MenuItem>
                 <MenuItem value="professionnelle">
-                  <Checkbox checked={field.value.includes("professionnelle")} />
+                  <Checkbox checked={field.value === "professionnelle"} />
                   <ListItemText primary="Professionnelle" />
                 </MenuItem>
               </Select>
@@ -57,21 +74,48 @@ const SimForm = ({ onSubmit, defaultValues = {} }) => {
           control={control}
           render={({ field }) => (
             <FormControl fullWidth>
-              <InputLabel>Type</InputLabel>
+              <InputLabel>type operateur</InputLabel>
               <Select
-                multiple
                 value={field.value}
                 onChange={(e) => field.onChange(e.target.value)}
-                renderValue={(selected) => selected.join(', ')}
+                renderValue={(selected) => selected}
               >
                 <MenuItem value="Ooredoo">
-                  <Checkbox checked={field.value.includes("Ooredoo")} />
+                  <Checkbox checked={field.value === "Ooredoo"} />
                   <ListItemText primary="Ooredoo" />
                 </MenuItem>
                 <MenuItem value="Telecom">
-                  <Checkbox checked={field.value.includes("Telecom")} />
+                  <Checkbox checked={field.value === "Telecom"} />
                   <ListItemText primary="Telecom" />
                 </MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        />
+        <Controller
+          name="typeSIM"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth>
+              <InputLabel>Type SIM</InputLabel>
+              <Select
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                renderValue={(selected) => selected}
+              >
+                <MenuItem value="AFI">AFI</MenuItem>
+                <MenuItem value="AFX">AFX</MenuItem>
+                <MenuItem value="BOX">BOX</MenuItem>
+                <MenuItem value="CLE">CLE</MenuItem>
+                <MenuItem value="AZIZA">AZIZA</MenuItem>
+                <MenuItem value="ALARME">ALARME</MenuItem>
+                <MenuItem value="ASTREINTE">ASTREINTE</MenuItem>
+                <MenuItem value="TRANSPORT">TRANSPORT</MenuItem>
+                <MenuItem value="LOGISTIQUE">LOGISTIQUE</MenuItem>
+                <MenuItem value="DAHLIA ICE">DAHLIA ICE</MenuItem>
+                <MenuItem value="UNIVERS TRANSPORT">UNIVERS TRANSPORT</MenuItem>
+                <MenuItem value="UNIVERS LOGISTIQUE">UNIVERS LOGISTIQUE</MenuItem>
+                <MenuItem value="PRESTATEURE DE SERVICE">PRESTATEURE DE SERVICE</MenuItem>
               </Select>
             </FormControl>
           )}

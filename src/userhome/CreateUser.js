@@ -1,159 +1,403 @@
-import React, { useMemo, useState } from "react";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-} from "material-react-table";
-import { TextField, Button, Stack, Modal, Box, useTheme } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import _ from "lodash";
-import { tokens } from "../theme";
-import UserForm from "./UserForm"; // Import du formulaire UserForm
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { Button, Box, TextField, Stack, IconButton, Typography, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText ,   Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import axios from 'axios';
 
-// Panel for editing user details
-const UtilisateurFormPanel = (props) => {
-  const { row } = props;
-  const { _id, ...utilisateur } = props.utilisateur;
-  const { control } = useForm({
-    defaultValues: utilisateur,
+const UserForm = ({ onSubmit }) => {
+  const { control, handleSubmit, reset, setValue, getValues } = useForm({
+    defaultValues: {
+      matricule: '',
+      nom: '',
+      prenom: '',
+      societe: '',
+      site: '',
+      cin: '',
+      pusAssignments: [], // Default value for pusAssignments
+    },
   });
 
-  return (
-    <Stack
-      component="form"
-      method="PUT"
-      direction={"row"}
-      flexWrap={"wrap"}
-      columnGap={3}
-      rowGap={3}
-    >
-      {_.keys(utilisateur).map((item) => (
-        <Controller
-          key={item}
-          control={control}
-          name={item}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              sx={{ flexBasis: "23%", bgcolor: "white" }}
-              placeholder={`Enter Your ${_.upperFirst(item)}`}
-            />
-          )}
-        />
-      ))}
-      <Button type="submit" disableElevation variant="contained" size="large">
-        Update Details
-      </Button>
-    </Stack>
-  );
-};
+  const [pusList, setPusList] = useState([]); // State to store the PUS entries
+  const [error, setError] = useState(''); // State to store error message
+  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog visibility
+  const [pusCheckResult, setPusCheckResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-};
 
-// Main component displaying the table
-const CreateUser = ({ isPending, data }) => {
-  const [tableData, setTableData] = useState(data ?? []);
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
 
-  const [openUserModal, setOpenUserModal] = useState(false); // État pour gérer l'ouverture du modal
-  const handleOpenUserModal = () => setOpenUserModal(true);
-  const handleCloseUserModal = () => setOpenUserModal(false);
+  const checkPUS = async (pusDataToCheck) => {
+    const pusNumbers = pusDataToCheck.map(pus => ({
+      number: pus.number,
+      type: pus.usage_type
+  }));
+  
+    try {
+      const response = await axios.post('http://localhost:3000/pus/check', { pusNumbers });
+      console.log('Response from PUS check:', response);
+  
+      // Extract the missingPus array from the response data
+      const missingPus = response.data.missingPus;
+      console.log('Missing PUS Numbers:', missingPus);
+  
+      return missingPus; // Return the array of missing PUS numbers
+    } catch (error) {
+      console.error("Error checking PUS:", error);
+      return null; // Return null in case of an error
+    }
+  };
+  
+  // Add PUS to the list
+  const handleSavePUS = () => {
+    const pusData = {
+      number: getValues('pus.number'),
+      type: getValues('pus.type'),
+      usage_type: getValues('pus.usage_type'),
+      quota: getValues('pus.quota'),
+      typeSIM: getValues('pus.typeSIM'),
+    };
+  
+    if (pusData.number && pusData.type && pusData.usage_type && pusData.quota && pusData.typeSIM) {
+      setPusList([...pusList, pusData]);
+      resetField();
+    } else {
+      console.log('Please fill out all PUS fields.');
+    }
+  };
+  
 
-  const onSubmitUser = (newUser) => {
-    setTableData([...tableData, newUser]); // Ajouter le nouvel utilisateur aux données du tableau
-    handleCloseUserModal(); // Fermer la modale après la soumission
+  // Remove a PUS from the list
+  const handleRemovePUS = (index) => {
+    const updatedPusList = pusList.filter((_, i) => i !== index);
+    setPusList(updatedPusList);
   };
 
-  // Columns definition for the table
-  const columns = useMemo(
-    () => [
-      { accessorKey: "mtricule", header: "Matricule" },
-      { accessorKey: "nom", header: "Nom" },
-      { accessorKey: "prenom", header: "Prenom" },
-      { accessorKey: "role", header: "Role" },
-      { accessorKey: "societe", header: "Société" },
-      { accessorKey: "site", header: "Site" },
-    ],
-    []
-  );
+  // Clear the PUS form fields
+  const resetField = () => {
+    setValue('pus.number', '');
+    setValue('pus.type', '');
+    setValue('pus.usage_type', '');
+    setValue('pus.quota', '');
+    setValue('pus.typeSIM', ''); // Clear typeSIM field
+  };
 
-  const table = useMaterialReactTable({
-    state: {
-      isLoading: isPending,
-      showProgressBars: isPending,
-    },
-    initialState: {
-      pagination: { pageIndex: 0, pageSize: 5 },
-    },
-    columns,
-    data: tableData, // Use the updated tableData
-    enableRowSelection: true,
-    muiDetailPanelProps: {
-      sx: {
-        bgcolor: colors.primary[400],
-      },
-    },
-    renderToolbarAlertBannerContent: ({ table, selectedAlert }) => {
-      return (
-        <Stack
-          sx={{ p: 2 }}
-          direction={"row"}
-          alignItems={"center"}
-          justifyContent={"flex-start"}
-          spacing={2}
-        >
-          {selectedAlert}
-          <Button
-            disableElevation
-            size="small"
-            color="error"
-            variant="contained"
-            onClick={() => {
-              const selectedIds = table
-                .getSelectedRowModel()
-                .rows.map((item) => item.original._id);
-              console.log("Selected IDs:", selectedIds);
-              table.toggleAllPageRowsSelected(false);
-            }}
-          >
-            Delete selected
-          </Button>
-        </Stack>
-      );
-    },
-    renderDetailPanel: ({ row }) => {
-      const utilisateur = _.omit(row.original, ["__v"]);
-      return <UtilisateurFormPanel utilisateur={utilisateur} row={row} />;
-    },
-  });
+
+  const handleFormSubmit = async (data) => {
+  setErrorMessage(''); // Clear previous error messages
+
+  try {
+    // Extract PUS data from the form
+    const formPusData = {
+      number: getValues('pus.number'),
+      type: getValues('pus.type'),
+      usage_type: getValues('pus.usage_type'),
+      quota: getValues('pus.quota'),
+      typeSIM: getValues('pus.typeSIM'),
+    };
+
+    // Include PUS data from the form if all fields are filled
+    let pusDataToCheck = [...pusList];
+    if (formPusData.number && formPusData.type && formPusData.usage_type && formPusData.quota && formPusData.typeSIM) {
+      pusDataToCheck.push(formPusData);
+    }
+
+    // Step 1: Check if the PUS exists
+    const pusCheckData = await checkPUS(pusDataToCheck);
+
+    if (pusCheckData && pusCheckData.length > 0) {
+      // Step 2: If PUS data is returned, open dialog to ask the user to confirm
+      setPusCheckResult(pusCheckData);
+      setDialogOpen(true); // Show the dialog with the result
+    } else {
+      // Step 3: If no PUS is found, proceed with the submission
+      await submitEmployeeData(data);
+    }
+  } catch (error) {
+    // Handle any errors that occur during the submission
+    if (error.response && error.response.data && error.response.data.errors) {
+      // Extract errors from the array and join them into a single string
+      const errorMessages = error.response.data.errors.join(', ');
+      setErrorMessage(`Error creating user: ${errorMessages}`);
+    } else {
+      setErrorMessage('An unexpected error occurred.'); // Default error message
+    }
+  }
+};
+
+  
+  
+  // Handle form submission
+  const handleForceSubmit = async () => {
+    setErrorMessage(''); // Clear previous error messages
+  
+    try {
+      // Close the dialog
+      setDialogOpen(false);
+  
+      // Get current form values
+      const data = getValues();
+  
+      // Proceed with the form submission
+      await submitEmployeeData(data);
+    } catch (error) {
+      // Handle any errors that occur during the submission
+      if (error.response && error.response.data && Array.isArray(error.response.data.errors)) {
+        // Extract errors from the array and join them into a single string
+        setErrorMessage(error.response.data.errors.join(', '));
+      } else {
+        setErrorMessage('An unexpected error occurred.'); // Default error message
+      }
+    }
+  };
+  
+  const submitEmployeeData = async (data) => {
+    const formData = {
+      ...data,
+      pusAssignments: pusList.length > 0 ? pusList : [], // Include pusAssignments even if empty
+    };
+
+    try {
+      const baseUrl = 'http://localhost:3000';
+      const endpoint = '/employe/add';
+      const response = await axios.post(`${baseUrl}${endpoint}`, formData);
+      console.log('User Created:', response.data);
+
+      // Pass the form data to the parent component
+      onSubmit(formData);
+
+      reset();
+      setPusList([]); // Clear pusList after successful submission
+      setError(''); // Clear any previous error messages
+    } catch (error) {
+      console.error("Error creating user:", error.response ? error.response.data : error.message);
+      setError(error.response ? error.response.data.message : 'An error occurred');
+    }
+  };
 
   return (
-    <Stack spacing={2}>
-      {/* Ajouter un bouton pour ouvrir la modale du formulaire d'utilisateur */}
-      <Button onClick={handleOpenUserModal} variant="contained" color="primary">
-        Ajouter Utilisateur
-      </Button>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <Stack spacing={2}>
+        <Controller
+          name="matricule"
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} label="Matricule" variant="outlined" fullWidth />
+          )}
+        />
+        <Controller
+          name="nom"
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} label="Nom" variant="outlined" fullWidth />
+          )}
+        />
+        <Controller
+          name="prenom"
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} label="Prenom" variant="outlined" fullWidth />
+          )}
+        />
+        <Controller
+          name="societe"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth>
+              <InputLabel id="societe-label">Société</InputLabel>
+              <Select
+                {...field}
+                labelId="societe-label"
+                label="Société"
+                value={field.value || ""}
+                onChange={(event) => field.onChange(event.target.value)}
+              >
+                <MenuItem value="AZIZA">AZIZA</MenuItem>
+                <MenuItem value="TRANSPORT">TRANSPORT</MenuItem>
+                <MenuItem value="LOGISTIQUE">LOGISTIQUE</MenuItem>
+                <MenuItem value="UNIVERS TRANSPORT">UNIVERS TRANSPORT</MenuItem>
+                <MenuItem value="UNIVERS LOGISTIQUE">UNIVERS LOGISTIQUE</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        />
+        <Controller
+          name="site"
+          control={control}
+          render={({ field }) => (
+            <FormControl fullWidth>
+              <InputLabel id="site-label">Site</InputLabel>
+              <Select
+                {...field}
+                labelId="site-label"
+                label="Site"
+                value={field.value || ""}
+                onChange={(event) => field.onChange(event.target.value)}
+              >
+                <MenuItem value="BOUARGOUB">BOUARGOUB</MenuItem>
+                <MenuItem value="GT">GT</MenuItem>
+                <MenuItem value="SAHLIN">SAHLIN</MenuItem>
+                <MenuItem value="SFAX">SFAX</MenuItem>
+                <MenuItem value="SUD">SUD</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+        />
+        <Controller
+          name="cin"
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} label="CIN" variant="outlined" fullWidth />
+          )}
+        />
 
-      <MaterialReactTable table={table} />
+        {/* PUS Assignment Fields */}
+        <Typography variant="h6">Add PUS</Typography>
+        <Stack direction="row" spacing={2} alignItems="center">
+          {/* PUS Number */}
+          <Controller
+            name="pus.number"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="PUS Number"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
+          
+          {/* Usage Type */}
+          <Controller
+            name="pus.usage_type"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth>
+                <InputLabel>Type d'Usage</InputLabel>
+                <Select
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  renderValue={(selected) => selected}
+                  fullWidth
+                >
+                  <MenuItem value="personnelle">
+                    <Checkbox checked={field.value === "personnelle"} />
+                    <ListItemText primary="Personnelle" />
+                  </MenuItem>
+                  <MenuItem value="professionnelle">
+                    <Checkbox checked={field.value === "professionnelle"} />
+                    <ListItemText primary="Professionnelle" />
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
 
-      {/* Fenêtre modale pour ajouter un utilisateur */}
-      <Modal open={openUserModal} onClose={handleCloseUserModal}>
-        <Box sx={modalStyle}>
-          <h2>Ajouter un nouvel utilisateur</h2>
-          <UserForm onSubmit={onSubmitUser} />
-        </Box>
-      </Modal>
-    </Stack>
+          {/* Operator Type */}
+          <Controller
+            name="pus.type"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth>
+                <InputLabel>Type Operateur</InputLabel>
+                <Select
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  renderValue={(selected) => selected}
+                  fullWidth
+                >
+                  <MenuItem value="Ooredoo">
+                    <Checkbox checked={field.value === "Ooredoo"} />
+                    <ListItemText primary="Ooredoo" />
+                  </MenuItem>
+                  <MenuItem value="Telecom">
+                    <Checkbox checked={field.value === "Telecom"} />
+                    <ListItemText primary="Telecom" />
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
+
+          {/* SIM Type */}
+          <Controller
+            name="pus.typeSIM"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth>
+                <InputLabel>Type SIM</InputLabel>
+                <Select
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  renderValue={(selected) => selected}
+                  fullWidth
+                >
+                  <MenuItem value="AFI">AFI</MenuItem>
+                  <MenuItem value="AFX">AFX</MenuItem>
+                  <MenuItem value="BOX">BOX</MenuItem>
+                  <MenuItem value="CLE">CLE</MenuItem>
+                  <MenuItem value="AZIZA">AZIZA</MenuItem>
+                  <MenuItem value="ALARME">ALARME</MenuItem>
+                  <MenuItem value="MOBILE">MOBILE</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
+
+          {/* Quota */}
+          <Controller
+            name="pus.quota"
+            control={control}
+            render={({ field }) => (
+              <TextField {...field} label="Quota" variant="outlined" fullWidth />
+            )}
+          />
+
+          <Button variant="contained" color="primary" onClick={handleSavePUS}>Add PUS</Button>
+        </Stack>
+
+        {/* Display PUS List */}
+        {pusList.length > 0 && (
+          <Box mt={2}>
+            <Typography variant="h6">PUS List</Typography>
+            {pusList.map((pus, index) => (
+              <Stack key={index} direction="row" spacing={2} alignItems="center" mb={1}>
+                <Typography variant="body1">{`Number: ${pus.number}, Type: ${pus.type}, Usage Type: ${pus.usage_type}, Quota: ${pus.quota}, Type SIM: ${pus.typeSIM}`}</Typography>
+                <IconButton onClick={() => handleRemovePUS(index)}>
+                  <RemoveCircleIcon color="error" />
+                </IconButton>
+              </Stack>
+            ))}
+          </Box>
+        )}
+
+        <Button type="submit" variant="contained" color="primary">Submit</Button>
+        {errorMessage && (
+  <div style={{ color: 'red', marginTop: '20px' }}>
+    {errorMessage}
+  </div>
+)}
+      </Stack>
+
+      {error && <Typography color="error">{error}</Typography>}
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>PUS Conflict</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            The following PUS are already in the system:
+            {pusCheckResult && pusCheckResult.map((pus, index) => (
+              <Typography key={index}>{`Number: ${pus.number}`}</Typography>
+            ))}
+            Do you want to add the employee anyway?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="secondary">Cancel</Button>
+          <Button onClick={handleForceSubmit} color="primary">Add by Force</Button>
+        </DialogActions>
+      </Dialog>
+    </form>
   );
 };
 
-export default CreateUser;
+export default UserForm;

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Typography, Box, useTheme } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText,  Typography, Box, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
+
 
 const SidebarComponent = () => {
   const theme = useTheme();

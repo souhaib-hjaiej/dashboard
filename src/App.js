@@ -1,33 +1,63 @@
-import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@emotion/react";
-import {ColorModeContext, useMode} from "./theme";
+import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline } from "@mui/material";
 import Topbar from "./home/Topbar";
 import Sidebar from "./home/Sidebar";
 import AdressBook from "./userhome/AdressBook";
 import Sim from "./userhome/Sim";
-import CreateUser from "./userhome/CreateUser";
+import Users from "./userhome/users";
+import Login from "./userhome/login";
 
 function App() {
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); 
 
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-        <Sidebar isSidebar={isSidebar}  />
+          {isAuthenticated && (
+            <>
+              <Sidebar />
+             
+            </>
+          )}
           <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={<AdressBook />} />
-              <Route path="/sim" element={<Sim />} />
-              <Route path="/create-user" element={<CreateUser />} />
-            
-              
+              <Route
+                path="/login"
+                element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/adressbook" />}
+              />
+              <Route
+                path="/adressbook"
+                element={isAuthenticated ? <AdressBook /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/sim"
+                element={isAuthenticated ? <Sim /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/create-user"
+                element={isAuthenticated ? <Users /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="*"
+                element={<Navigate to={isAuthenticated ? "/adressbook" : "/login"} />}
+              />
             </Routes>
           </main>
         </div>
@@ -35,6 +65,5 @@ function App() {
     </ColorModeContext.Provider>
   );
 }
-
 
 export default App;

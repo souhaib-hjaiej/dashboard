@@ -1,21 +1,55 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Stack, Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Stack,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Checkbox,
+  ListItemText,
+  List,
+  ListItem,
+  Typography,
+} from "@mui/material";
 
-const UserForm = ({ onSubmit, defaultValues = {} }) => {
-  const { control, handleSubmit, reset } = useForm({
+const UserForm = ({ onSubmit, defaultValues = {}, pusData = [] }) => {
+  console.log('UserForm component rendered');
+  console.log('Props received:', { defaultValues, pusData });
+
+  const { control, handleSubmit, reset, watch } = useForm({
     defaultValues: {
-      matricule: '',
-      nom: '',
-      prenom: '',
-      role: [],
-      societe: [],
-      site: [],
-      ...defaultValues, // Allow overriding default values
+      matricule: defaultValues.matricule || '',
+      nom: defaultValues.nom || '',
+      prenom: defaultValues.prenom || '',
+      role: defaultValues.role || [],
+      societe: defaultValues.societe || [],
+      site: defaultValues.site || [],
+      number: defaultValues.number || '', // Ensure it's not undefined
     },
   });
 
+  const [filteredNumbers, setFilteredNumbers] = React.useState([]);
+
+  const watchNumber = watch("number");
+
+  const handleNumberSearch = (inputValue) => {
+    if (inputValue && pusData.length > 0) {
+      const filtered = pusData.filter((pus) => pus.number.includes(inputValue));
+      setFilteredNumbers(filtered);
+    } else {
+      setFilteredNumbers([]);
+    }
+  };
+
+  React.useEffect(() => {
+    handleNumberSearch(watchNumber);
+  }, [watchNumber, pusData]);
+
   const submitHandler = (data) => {
+    console.log("Form Data:", data); // Log the form data on submit
     onSubmit(data);
     reset(); // Reset form after submit
   };
@@ -44,6 +78,40 @@ const UserForm = ({ onSubmit, defaultValues = {} }) => {
             <TextField {...field} label="Prénom" fullWidth />
           )}
         />
+
+        <Controller
+          name="number"
+          control={control}
+          defaultValue="" // Ensure a default value is provided
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Search Number"
+              fullWidth
+              onChange={(e) => {
+                field.onChange(e);
+                handleNumberSearch(e.target.value);
+              }}
+            />
+          )}
+        />
+
+        {watchNumber && filteredNumbers.length === 0 ? (
+          <Typography variant="body2" color="error">
+            No matching PUS number found.
+          </Typography>
+        ) : null}
+
+        {filteredNumbers.length > 0 && (
+          <List>
+            {filteredNumbers.map((pus) => (
+              <ListItem key={pus.id}>
+                {pus.number} - {pus.type}
+              </ListItem>
+            ))}
+          </List>
+        )}
+
         <Controller
           name="role"
           control={control}
@@ -68,6 +136,7 @@ const UserForm = ({ onSubmit, defaultValues = {} }) => {
             </FormControl>
           )}
         />
+
         <Controller
           name="societe"
           control={control}
@@ -92,6 +161,7 @@ const UserForm = ({ onSubmit, defaultValues = {} }) => {
             </FormControl>
           )}
         />
+
         <Controller
           name="site"
           control={control}
@@ -116,6 +186,7 @@ const UserForm = ({ onSubmit, defaultValues = {} }) => {
             </FormControl>
           )}
         />
+
         <Button type="submit" variant="contained" color="primary">
           Créer
         </Button>

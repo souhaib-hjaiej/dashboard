@@ -1,3 +1,4 @@
+
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 
@@ -136,7 +137,7 @@ export const ColorModeContext = createContext({
 
 // Custom hook to use color mode
 export const useMode = () => {
-  const [mode, setMode] = useState("dark");
+  const [mode, setMode] = useState("light");
 
   const colorMode = useMemo(
     () => ({
@@ -151,5 +152,5 @@ export const useMode = () => {
   return [theme, colorMode];
 };
 
-// Export tokens function
+
 export const tokens = (mode) => getDesignTokens(mode);
