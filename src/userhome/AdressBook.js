@@ -87,7 +87,7 @@ const EmployeFormPanel = ({ employe }) => {
               control={control}
               name={item}
               render={({ field }) => (
-                <FormControl sx={{ flexBasis: "25%", bgcolor: "white" }} fullWidth>
+                <FormControl sx={{ flexBasis: "25%", bgcolor: "background.default" }} fullWidth>
                   <InputLabel id="site-label">Site</InputLabel>
                   <Select
                     {...field}

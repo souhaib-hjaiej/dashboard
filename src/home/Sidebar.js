@@ -76,6 +76,7 @@ const SidebarComponent = () => {
               <ListItemText primary="SIM" sx={{ color: selected === 'SIM' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
             </ListItemButton>
           </ListItem>
+
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/create-user" onClick={() => handleClick('Gestion Utilisateur')}>
               <ListItemIcon>
@@ -84,9 +85,16 @@ const SidebarComponent = () => {
               <ListItemText primary="Gestion utilisateur" sx={{ color: selected === 'Gestion Utilisateur' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
             </ListItemButton>
           </ListItem>
+
           <ListItem disablePadding>
-           
+            <ListItemButton component={Link} to="/dashboard" onClick={() => handleClick('Dashboard')}>
+              <ListItemIcon>
+                <PersonOutlinedIcon sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+            </ListItemButton>
           </ListItem>
+          
         </List>
       </Box>
     </Drawer>

@@ -9,10 +9,12 @@ import AdressBook from "./userhome/AdressBook";
 import Sim from "./userhome/Sim";
 import Users from "./userhome/users";
 import Login from "./userhome/login";
-
+import Dashboard from "./userhome/dashbord";
 function App() {
   const [theme, colorMode] = useMode();
   const [isAuthenticated, setIsAuthenticated] = useState(true); 
+  const [user, setUser] = useState(null);
+  const [isSidebar, setIsSidebar] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -32,11 +34,9 @@ function App() {
         <div className="app">
           {isAuthenticated && (
             <>
-              <Sidebar />
-             
-            </>
-          )}
-          <main className="content">
+               <Sidebar isSidebar={isSidebar}  /> 
+               <main className="content">
+          <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
               <Route
                 path="/login"
@@ -54,12 +54,19 @@ function App() {
                 path="/create-user"
                 element={isAuthenticated ? <Users /> : <Navigate to="/login" />}
               />
+               <Route
+                path="/dashboard"
+                element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+              />
               <Route
                 path="*"
                 element={<Navigate to={isAuthenticated ? "/adressbook" : "/login"} />}
               />
             </Routes>
           </main>
+            </>
+          )}
+         
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
