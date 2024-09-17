@@ -28,7 +28,7 @@ import {
 
 import { useForm, Controller } from "react-hook-form";
 import _ from "lodash";
-import ImportEx from "./ImportEx";
+import ImportpusEX from "./importPusEx";
 import { tokens } from "../theme";
 import { fetchPusData, updatePus, deletepus } from "../service/pus";
 import SimForm from "./SimForm";
@@ -67,7 +67,7 @@ const SimPanel = ({ row, sim, onUpdate }) => {
       .map((item) => {
         if (item === "societe") {
           return (
-            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "white" }}>
+            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "background.default" }}>
               <InputLabel>{`Select ${_.upperFirst(item)}`}</InputLabel>
               <Controller
                 name={item}
@@ -94,7 +94,7 @@ const SimPanel = ({ row, sim, onUpdate }) => {
           );
         } else if (item === "type") {
           return (
-            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "white" }}>
+            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "background.default" }}>
               <InputLabel>Type Operateur</InputLabel>
               <Controller
                 name={item}
@@ -111,7 +111,7 @@ const SimPanel = ({ row, sim, onUpdate }) => {
           );
         } else if (item === "usage_type") {
           return (
-            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "white" }}>
+            <FormControl key={item} sx={{ flexBasis: "23%", bgcolor: "background.default" }}>
               <InputLabel>Type Usage</InputLabel>
               <Controller
                 name={item}
@@ -135,7 +135,7 @@ const SimPanel = ({ row, sim, onUpdate }) => {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  sx={{ flexBasis: "23%", bgcolor: "white" }}
+                  sx={{ flexBasis: "23%", bgcolor: "background.default" }}
                   placeholder={`Enter Your ${_.upperFirst(item)}`}
                 />
               )}
@@ -230,7 +230,7 @@ console.log(pusData);
       showProgressBars: isPending,
     },
     initialState: {
-      pagination: { pageIndex: 0, pageSize: 5 },
+      pagination: { pageIndex: 0, pageSize: 40 },
     },
     columns,
     data: tableData, // Use updated tableData
@@ -315,7 +315,7 @@ console.log(pusData);
         Ajouter SIM
       </Button>
 
-      <ImportEx onDataImport={setTableData} />
+      <ImportpusEX onDataImport={setTableData} />
       
       <MaterialReactTable table={table} />
     

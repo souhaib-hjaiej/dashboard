@@ -5,7 +5,8 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import PersonIcon from '@mui/icons-material/Person'; // Adjust based on the icon you choose
 
 const SidebarComponent = () => {
   const theme = useTheme();
@@ -60,14 +61,25 @@ const SidebarComponent = () => {
           </ListItem>
         </List>
         <List>
+
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/" onClick={() => handleClick('AdressBook')}>
+            <ListItemButton component={Link} to="/" onClick={() => handleClick('Dashboard')}>
+              <ListItemIcon>
+              <DashboardOutlinedIcon sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/adressbook" onClick={() => handleClick('Dashboard')}>
               <ListItemIcon>
                 <PeopleOutlinedIcon sx={{ color: selected === 'AdressBook' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
               </ListItemIcon>
               <ListItemText primary="Carnet d'adresse" sx={{ color: selected === 'AdressBook' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
             </ListItemButton>
           </ListItem>
+
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/sim" onClick={() => handleClick('SIM')}>
               <ListItemIcon>
@@ -86,14 +98,7 @@ const SidebarComponent = () => {
             </ListItemButton>
           </ListItem>
 
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/dashboard" onClick={() => handleClick('Dashboard')}>
-              <ListItemIcon>
-                <PersonOutlinedIcon sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-            </ListItemButton>
-          </ListItem>
+
           
         </List>
       </Box>

@@ -37,17 +37,17 @@ import axios from 'axios';
 
 
 // Panel for editing employee details
-const EmployeFormPanel = ({ employe }) => {
+const EmployeFormPanel = ({ employe ,onUpdate  }) => {
   const { _id, ...employeeData } = employe;
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit,  } = useForm({
     defaultValues: employeeData,
   });
 
   const submitHandler = async (data) => {
     try {
       await updateEmployee('http://localhost:3000', _id, data);
-      console.log("Updated data:", data);
-      reset();
+      onUpdate();
+     
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -115,7 +115,7 @@ const EmployeFormPanel = ({ employe }) => {
               control={control}
               name={item}
               render={({ field }) => (
-                <FormControl sx={{ flexBasis: "25%", bgcolor: "white" }} fullWidth>
+                <FormControl sx={{ flexBasis: "25%", bgcolor: "background.default" }} fullWidth>
                   <InputLabel id="societe-label">Société</InputLabel>
                   <Select
                     {...field}
@@ -144,7 +144,7 @@ const EmployeFormPanel = ({ employe }) => {
             render={({ field }) => (
               <TextField
                 {...field}
-                sx={{ flexBasis: "23%", bgcolor: "white" }}
+                sx={{ flexBasis: "23%", bgcolor: "background.default" }}
                 placeholder={`Enter Your ${_.upperFirst(item)}`}
               />
             )}
@@ -217,7 +217,9 @@ console.log(pussearch);
     setSelectedUserId(userId);
     setOpenPusDialog(true);
   };
-
+  const handleUpdate = () => { // Line to define handleUpdate
+    setRefreshKey((prevKey) => prevKey + 1); // Line to refresh the table data
+  };
   const columns = useMemo(
     () => [
       { accessorKey: "matricule", header: "Matricule" },
@@ -225,6 +227,7 @@ console.log(pussearch);
       { accessorKey: "prenom", header: "Prenom" },
       { accessorKey: "societe", header: "Société" },
       { accessorKey: "site", header: "Site" },
+      { accessorKey: "cin", header: "cin" },
       {
         accessorKey: "numero",
         header: "numero",
@@ -259,7 +262,7 @@ console.log(pussearch);
       showProgressBars: isPending,
     },
     initialState: {
-      pagination: { pageIndex: 0, pageSize: 5 },
+      pagination: { pageIndex: 0, pageSize: 40 },
     },
     columns,
     data: tableData, // Use the updated tableData
@@ -298,7 +301,11 @@ console.log(pussearch);
     ),
     renderDetailPanel: ({ row }) => {
       const employe = _.omit(row.original, ["__v"]);
-      return <EmployeFormPanel employe={employe} />;
+      return<EmployeFormPanel 
+      employe={employe}  
+      onUpdate={handleUpdate}
+    />
+    
     },
   });
 
@@ -362,7 +369,7 @@ console.log(pussearch);
         pusData={pussearch}
          />
       )}
-     <div style={{ transform: 'scale(0.93)', transformOrigin: 'top left', overflow: 'auto' }}>
+     <div style={{ transform: 'scale(0.86)', transformOrigin: 'top left', overflow: 'auto' }}>
       {/* Apply zoom directly to the container */}
       <MaterialReactTable table={table} />
     </div>

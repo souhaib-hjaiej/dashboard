@@ -1,9 +1,8 @@
 import React from "react";
 import { Button, Input } from "@mui/material";
-import * as XLSX from "xlsx";
 import axios from 'axios';
-import FileUploadIcon from '@mui/icons-material/Upload';
-const ImportEx = ({ onDataImport }) => {
+
+const ImportpusEX = ({ onDataImport }) => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -12,7 +11,7 @@ const ImportEx = ({ onDataImport }) => {
 
       try {
         // Replace with your backend API URL
-        const response = await axios.post('http://localhost:3000/api/uploadempl', formData, {
+        const response = await axios.post('http://localhost:3000/api/uploadpus', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -57,4 +56,4 @@ const ImportEx = ({ onDataImport }) => {
   );
 };
 
-export default ImportEx;
+export default ImportpusEX;

@@ -1,25 +1,29 @@
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Stack, FormControl, InputLabel, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { TextField, Button, Stack, FormControl, InputLabel, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import axios from 'axios';
 
 // Function to check if PUS exists
-const checkPUS = async (pusNumber, type) => {
-  // If the type is not "professionnelle", return true immediately
-  if (type !== 'professionnelle') {
-    return true;
-  }
+const checkPUS = async (pusDataToCheck) => {
+  const pusNumbers = pusDataToCheck.map(pus => ({
+    number: pus.number,
+    type: pus.usage_type
+  }));
 
   try {
-    const response = await axios.post('http://localhost:3000/pus/check', { pusNumbers: [pusNumber] });
-    const missingPus = response.data.missingPus;
-    return missingPus.length === 0; // Returns true if PUS exists, false otherwise
+    const response = await axios.post('http://localhost:3000/pus/check', { pusNumbers });
+    console.log('Response from PUS check:', response);
+
+    // Extract the missingPus array from the response data
+    const missingPus = response.data.missingPus || [];
+    console.log('Missing PUS Numbers:', missingPus);
+
+    return missingPus; // Return the array of missing PUS numbers
   } catch (error) {
     console.error("Error checking PUS:", error);
-    return false;
+    return null; // Return null in case of an error
   }
 };
-
 
 // Main component
 const AffectationSim = ({ idempl }) => {
@@ -35,6 +39,7 @@ const AffectationSim = ({ idempl }) => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [pusToAdd, setPusToAdd] = useState(null);
+  const [error, setError] = useState('');
 
   // Function to handle dialog close
   const handleDialogClose = async () => {
@@ -47,8 +52,6 @@ const AffectationSim = ({ idempl }) => {
   // Function to add PUS and affectation
   const addPUS = async (pus) => {
     try {
-      
-      
       await axios.post("http://localhost:3000/pusaffectation/add", pus);
       reset();
     } catch (error) {
@@ -65,16 +68,29 @@ const AffectationSim = ({ idempl }) => {
       quota: data.quota,
       idempl
     };
-  
+
     // Check PUS based on type
-    const pusExists = await checkPUS(data.numero, data.type);
-  
-    if (pusExists) {
+    const pusExists = await checkPUS([{ number: data.numero, usage_type: data.typeUsage }]);
+
+    if (pusExists.length > 0) {
       try {
+        // Send data to the server
         await axios.post("http://localhost:3000/pusaffectation/add", formData);
-        reset();
+        reset(); // Reset form after successful submission
+        setError(''); // Clear any previous errors
       } catch (error) {
-        console.error("Error submitting form with axios:", error);
+        if (error.response && error.response.status === 400) {
+          // Handle the case where the PUS is already assigned
+          if (error.response.data.message.includes("already assigned")) {
+            setError("PUS is already assigned"); // Set the error message if assigned
+          } else {
+            // Handle other 400 errors (e.g., validation errors)
+            console.error("Validation error:", error.response.data.message || error.response.data.errors);
+          }
+        } else {
+          // Handle other server or network errors
+          console.error("Unexpected error:", error.message);
+        }
       }
     } else {
       // Open the dialog if PUS does not exist
@@ -82,7 +98,6 @@ const AffectationSim = ({ idempl }) => {
       setOpenDialog(true);
     }
   };
-  
 
   return (
     <div>
@@ -182,9 +197,7 @@ const AffectationSim = ({ idempl }) => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>PUS Not Found</DialogTitle>
         <DialogContent>
-          <Typography>
-            The PUS is not found. Would you like to add it?
-          </Typography>
+          The PUS is not found. Would you like to add it?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="primary">

@@ -10,21 +10,24 @@ import Sim from "./userhome/Sim";
 import Users from "./userhome/users";
 import Login from "./userhome/login";
 import Dashboard from "./userhome/dashbord";
+
 function App() {
   const [theme, colorMode] = useMode();
-  const [isAuthenticated, setIsAuthenticated] = useState(true); 
-  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSidebar, setIsSidebar] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(false);
-    }
+    setIsAuthenticated(!!token);
   }, []);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    setIsAuthenticated(false);
   };
 
   return (
@@ -34,13 +37,20 @@ function App() {
         <div className="app">
           {isAuthenticated && (
             <>
-               <Sidebar isSidebar={isSidebar}  /> 
-               <main className="content">
-          <Topbar setIsSidebar={setIsSidebar} />
+              <Sidebar isSidebar={isSidebar} />
+             
+            </>
+          )}
+          <main className="content">
+          <Topbar setIsSidebar={setIsSidebar} onLogout={handleLogout} />
             <Routes>
               <Route
                 path="/login"
-                element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/adressbook" />}
+                element={!isAuthenticated ? <Login onLogin={handleLogin} /> : <Navigate to="/dashboard" />}
+              />
+              <Route
+                path="/dashboard"
+                element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
               />
               <Route
                 path="/adressbook"
@@ -54,19 +64,13 @@ function App() {
                 path="/create-user"
                 element={isAuthenticated ? <Users /> : <Navigate to="/login" />}
               />
-               <Route
-                path="/dashboard"
-                element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-              />
+              
               <Route
                 path="*"
-                element={<Navigate to={isAuthenticated ? "/adressbook" : "/login"} />}
+                element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
               />
             </Routes>
           </main>
-            </>
-          )}
-         
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>

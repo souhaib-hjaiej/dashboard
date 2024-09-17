@@ -16,7 +16,7 @@ const EmployeFormPanel = ({ employe, onUpdate }) => {
     defaultValues: { ...employeeData, site, societe },
   });
 
-  const [siteOptions] = React.useState(["sahloul", "bouargoub", "RADES"]); // Mock site options
+  const [siteOptions] = React.useState(["BOUARGOUB", "GT", "SAHLIN","SFAX","SUD"]); // Mock site options
   const [societeOptions] = React.useState([
     "LOGISTIQUE",
     "UNIVERS TRANSPORT",
@@ -52,7 +52,7 @@ const EmployeFormPanel = ({ employe, onUpdate }) => {
             render={({ field }) => (
               <TextField
                 {...field}
-                sx={{ flexBasis: "23%", bgcolor: "white" }}
+                sx={{ flexBasis: "23%", bgcolor: "background.default" }}
                 placeholder={`Enter Your ${_.upperFirst(item)}`}
               />
             )}
@@ -65,7 +65,7 @@ const EmployeFormPanel = ({ employe, onUpdate }) => {
         name="site"
         control={control}
         render={({ field }) => (
-          <FormControl sx={{ flexBasis: "23%", bgcolor: "white" }}>
+          <FormControl sx={{ flexBasis: "23%", bgcolor: "background.default" }}>
             <InputLabel>Site</InputLabel>
             <Select {...field} label="Site">
               {siteOptions.map((option) => (
@@ -83,7 +83,7 @@ const EmployeFormPanel = ({ employe, onUpdate }) => {
         name="societe"
         control={control}
         render={({ field }) => (
-          <FormControl sx={{ flexBasis: "23%", bgcolor: "white" }}>
+          <FormControl sx={{ flexBasis: "23%", bgcolor: "background.default" }}>
             <InputLabel>Société</InputLabel>
             <Select
               {...field}
@@ -164,7 +164,7 @@ const Users = ({ isPending: propIsPending, data }) => {
       showProgressBars: isPending,
     },
     initialState: {
-      pagination: { pageIndex: 0, pageSize: 5 },
+      pagination: { pageIndex: 0, pageSize: 20 },
     },
     columns,
     data: tableData,

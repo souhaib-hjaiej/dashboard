@@ -168,8 +168,8 @@ const UserForm = ({ onSubmit }) => {
       setPusList([]); // Clear pusList after successful submission
       setError(''); // Clear any previous error messages
     } catch (error) {
-      console.error("Error creating user:", error.response ? error.response.data : error.message);
-      setError(error.response ? error.response.data.message : 'An error occurred');
+      console.error("Error creating user:", error.response ? error.response.data.errors[0] : error.message);
+      setError(error.response ? error.response.data.errors[0] : 'An error occurred');
     }
   };
 

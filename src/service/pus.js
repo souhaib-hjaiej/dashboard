@@ -28,14 +28,15 @@ export const ajouterpus = async (url, data) => {
 
   export const updatePus = async (id, updatedSim) => {
     try {
-      // Include the ID in the request body along with the updated data
+      
       const response = await axios.patch('http://localhost:3000/pus/update', {
        ...updatedSim
       });
       return response.data;
+  
     } catch (error) {
       console.error('Error updating PUS:', error);
-      throw error; // Rethrow the error to handle it where the function is called
+      throw error; 
     }
   };
 
