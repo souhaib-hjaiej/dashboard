@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText,  Typography, Box, useTheme } from '@mui/material';
 import { Link } from 'react-router-dom';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
-import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
-import PersonIcon from '@mui/icons-material/Person'; // Adjust based on the icon you choose
+import EventIcon from '@mui/icons-material/Event';
+
 
 const SidebarComponent = () => {
   const theme = useTheme();
@@ -53,7 +52,7 @@ const SidebarComponent = () => {
               {!isCollapsed && (
                 <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
                   <Typography variant="h3" color={mode === 'dark' ? colors.dark.grey : colors.light.grey}>
-                    Lumiere
+                    SoSmaison
                   </Typography>
                 </Box>
               )}
@@ -63,7 +62,7 @@ const SidebarComponent = () => {
         <List>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/" onClick={() => handleClick('Dashboard')}>
+            <ListItemButton component={Link} to="/Dashboard" onClick={() => handleClick('Dashboard')}>
               <ListItemIcon>
               <DashboardOutlinedIcon sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
               </ListItemIcon>
@@ -71,32 +70,41 @@ const SidebarComponent = () => {
             </ListItemButton>
           </ListItem>
 
+        
+
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/adressbook" onClick={() => handleClick('Dashboard')}>
+            <ListItemButton component={Link} to="/home" onClick={() => handleClick('home')}>
               <ListItemIcon>
-                <PeopleOutlinedIcon sx={{ color: selected === 'AdressBook' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+                <ContactsOutlinedIcon sx={{ color: selected === 'home' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
               </ListItemIcon>
-              <ListItemText primary="Carnet d'adresse" sx={{ color: selected === 'AdressBook' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+              <ListItemText primary="home" sx={{ color: selected === 'home' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/sim" onClick={() => handleClick('SIM')}>
-              <ListItemIcon>
-                <ContactsOutlinedIcon sx={{ color: selected === 'SIM' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-              </ListItemIcon>
-              <ListItemText primary="SIM" sx={{ color: selected === 'SIM' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-            </ListItemButton>
-          </ListItem>
+  <ListItemButton component={Link} to="/calender" onClick={() => handleClick('calender')}>
+    <ListItemIcon>
+      <EventIcon sx={{ color: selected === 'calender' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+    </ListItemIcon>
+    <ListItemText primary="calender" sx={{ color: selected === 'calender' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+  </ListItemButton>
 
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/create-user" onClick={() => handleClick('Gestion Utilisateur')}>
-              <ListItemIcon>
-                <PersonOutlinedIcon sx={{ color: selected === 'Gestion Utilisateur' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-              </ListItemIcon>
-              <ListItemText primary="Gestion utilisateur" sx={{ color: selected === 'Gestion Utilisateur' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
-            </ListItemButton>
-          </ListItem>
+
+
+
+
+</ListItem>
+
+<ListItem disablePadding>
+  <ListItemButton component={Link} to="/password" onClick={() => handleClick('password')}>
+    <ListItemIcon>
+      <EventIcon sx={{ color: selected === 'password' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+    </ListItemIcon>
+    <ListItemText primary="password" sx={{ color: selected === 'password' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
+  </ListItemButton>
+</ListItem>
+
+          
 
 
           

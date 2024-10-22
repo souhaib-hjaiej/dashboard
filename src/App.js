@@ -3,13 +3,16 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@emotion/react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline } from "@mui/material";
-import Topbar from "./home/Topbar";
-import Sidebar from "./home/Sidebar";
-import AdressBook from "./userhome/AdressBook";
-import Sim from "./userhome/Sim";
-import Users from "./userhome/users";
-import Login from "./userhome/login";
-import Dashboard from "./userhome/dashbord";
+import Topbar from "./components/Topbar";
+import Sidebar from "./components/Sidebar";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import Dashboard from "./pages/dashbord";
+import Calendar from "./pages/calender";
+import CollaboratorDetails from "./pages/details";
+import ChangePasswordForm from './pages/modifier';
+import Forgetpassword from './pages/forgetpassword';
+
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -52,22 +55,29 @@ function App() {
                 path="/dashboard"
                 element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
               />
+             
               <Route
-                path="/adressbook"
-                element={isAuthenticated ? <AdressBook /> : <Navigate to="/login" />}
+                path="/home"
+                element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
               />
               <Route
-                path="/sim"
-                element={isAuthenticated ? <Sim /> : <Navigate to="/login" />}
+                path="/calender"
+                element={isAuthenticated ? <Calendar /> : <Navigate to="/login" />}
+              />
+
+              <Route
+                path="details"
+                element={isAuthenticated ? <CollaboratorDetails /> : <Navigate to="/login" />}
               />
               <Route
-                path="/create-user"
-                element={isAuthenticated ? <Users /> : <Navigate to="/login" />}
+                path="password"
+                element={isAuthenticated ? <ChangePasswordForm /> : <Navigate to="/login" />}
               />
-              
+           <Route path="forgetpassword" element={<Forgetpassword />} />
+
               <Route
                 path="*"
-                element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
+                element={<Navigate to={isAuthenticated ? "/home" : "/login"} />}
               />
             </Routes>
           </main>
