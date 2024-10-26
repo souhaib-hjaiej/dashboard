@@ -50,11 +50,20 @@ const SidebarComponent = () => {
                 <MenuOutlinedIcon sx={{ color: mode === 'dark' ? colors.dark.grey : colors.light.grey }} />
               </ListItemIcon>
               {!isCollapsed && (
-                <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
-                  <Typography variant="h3" color={mode === 'dark' ? colors.dark.grey : colors.light.grey}>
-                    SoSmaison
-                  </Typography>
-                </Box>
+                <Box display="flex" justifyContent="space-between" alignItems="center" >
+                {/* App Logo */}
+                <img
+                  src="logo.png" // Replace with the actual path to your logo image
+                  alt="App Logo"
+                  style={{ width: '50px', height: '50px',  }} // Adjust width, height, and margin as needed
+                />
+                
+                {/* App Name */}
+                <Typography variant="h3" color={mode === 'dark' ? colors.dark.grey : colors.light.grey}>
+                  SoSmaison
+                </Typography>
+              </Box>
+              
               )}
             </ListItemButton>
           </ListItem>
@@ -69,9 +78,6 @@ const SidebarComponent = () => {
               <ListItemText primary="Dashboard" sx={{ color: selected === 'Dashboard' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
             </ListItemButton>
           </ListItem>
-
-        
-
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/home" onClick={() => handleClick('home')}>
               <ListItemIcon>
@@ -88,11 +94,6 @@ const SidebarComponent = () => {
     </ListItemIcon>
     <ListItemText primary="calender" sx={{ color: selected === 'calender' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
   </ListItemButton>
-
-
-
-
-
 </ListItem>
 
 <ListItem disablePadding>
@@ -102,12 +103,7 @@ const SidebarComponent = () => {
     </ListItemIcon>
     <ListItemText primary="password" sx={{ color: selected === 'password' ? '#6870fa' : (mode === 'dark' ? colors.dark.grey : colors.light.grey) }} />
   </ListItemButton>
-</ListItem>
-
-          
-
-
-          
+</ListItem>   
         </List>
       </Box>
     </Drawer>

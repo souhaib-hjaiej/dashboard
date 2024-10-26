@@ -3,7 +3,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { Box, Button, TextField, Typography, Modal, IconButton, useTheme } from '@mui/material';
-import { Delete, Done, Close } from '@mui/icons-material';
+import { Delete, Done } from '@mui/icons-material';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -48,13 +48,12 @@ function Calendar() {
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
-    console.log('Selected date:', date ? date.format('YYYY-MM-DD') : null);
   };
 
   const handleAddEvent = () => {
     if (selectedDate && eventInput) {
       const dateKey = selectedDate.format('YYYY-MM-DD');
-      const newEvent = { description: eventInput, status: 'Not Done' };
+      const newEvent = { description: eventInput, done: false }; // Default status is "Not Done"
 
       axios.post(`${backendURL}/event/add`, { date: dateKey, ...newEvent })
         .then((response) => {
@@ -71,14 +70,15 @@ function Calendar() {
         });
     }
   };
+
   const toggleEventStatus = (dateKey, index) => {
     const updatedEvents = { ...events };
     const event = updatedEvents[dateKey][index];
   
-    if (event.status !== 'Done') {
+    if (!event.done) {
       axios.patch(`${backendURL}/event/update`, { id: event._id, done: true })
         .then(() => {
-          event.status = 'Done';
+          event.done = true; // Mark as done
           setEvents(updatedEvents);
         })
         .catch((error) => {
@@ -86,6 +86,7 @@ function Calendar() {
         });
     }
   };
+
   const handleDeleteEvent = (dateKey, index) => {
     const event = events[dateKey][index];
   
@@ -102,7 +103,7 @@ function Calendar() {
         console.error('Error deleting event:', error);
       });
   };
-  
+
   const isDateWithEvents = (date) => {
     const dateKey = date.format('YYYY-MM-DD');
     return !!events[dateKey];
@@ -191,8 +192,8 @@ function Calendar() {
                       {event.description}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {event.status === 'Done' && <Done sx={{ color: 'green', marginRight: 2 }} />}
-                      {event.status !== 'Done' && (
+                      {event.done && <Done sx={{ color: 'green', marginRight: 2 }} />}
+                      {!event.done && (
                         <IconButton onClick={() => toggleEventStatus(selectedDate.format('YYYY-MM-DD'), index)}>
                           <Done />
                         </IconButton>
@@ -238,21 +239,16 @@ function Calendar() {
           }}
         >
           <Typography id="add-event-modal" variant="h6" component="h2">
-            Ajouter un événement pour le {selectedDate ? selectedDate.format('YYYY-MM-DD') : 'date non sélectionnée'}
+            Ajouter un événement pour le {selectedDate ? selectedDate.format('YYYY-MM-DD') : ''}
           </Typography>
           <TextField
-            label="Ajouter un événement"
-            variant="outlined"
+            label="Description"
+            fullWidth
             value={eventInput}
             onChange={(e) => setEventInput(e.target.value)}
-            fullWidth
-            sx={{ marginTop: 2, input: { color: textColor }, label: { color: theme.palette.mode === 'dark' ? '#bbb' : '#555' }, bgcolor: backgroundColor }}
+            sx={{ marginY: 2 }}
           />
-          <Button 
-            variant="contained" 
-            onClick={handleAddEvent}
-            sx={{ marginTop: 2, bgcolor: '#1976d2' }}
-          >
+          <Button variant="contained" onClick={handleAddEvent} sx={{ bgcolor: '#1976d2' }}>
             Ajouter
           </Button>
         </Box>

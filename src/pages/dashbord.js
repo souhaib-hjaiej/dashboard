@@ -1,8 +1,8 @@
-import {useEffect ,useState} from 'react';
+import {useEffect, useState} from 'react';
 import React from 'react';
-import { Grid, Card, CardContent, Typography } from '@mui/material';
-import { Pie, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import {Grid, Card, CardContent, Typography} from '@mui/material';
+import {Pie, Bar} from 'react-chartjs-2';
+import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import axios from 'axios';
 
@@ -11,54 +11,48 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const Dashboard = () => {
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalCollaborators, setTotalCollaborators] = useState(0);
-    const [totalcolabAcitve, setTotalcolabAcitve] = useState(0);
-    const [totalcolabNonAcitve, setTotalcolabNonAcitve] = useState(0);
+    const [totalcolabActive, setTotalcolabActive] = useState(0);
+    const [totalcolabNonActive, setTotalcolabNonActive] = useState(0);
     const [specialtyData, setSpecialtyData] = useState([]);
     const [serviceData, setServiceData] = useState([]);
 
     useEffect(() => {
-        // First request: Fetching total users and collaborators
+        // Première requête : Récupérer le nombre total d'utilisateurs et de collaborateurs
         axios.get('http://localhost:3000/total').then(response => {
             setTotalUsers(response.data.totalUsers);
             setTotalCollaborators(response.data.totalCollaborators);
-          
         });
-        axios.get('http://localhost:3000/statactive')
-        .then(response => {
-          const { activeCount, nonActiveCount } = response.data.data; // Access data object first
-          setTotalcolabAcitve(activeCount);
-          setTotalcolabNonAcitve(nonActiveCount);
-        })
-        .catch(error => {
-          console.error("Error fetching data", error);
-        });
-      
 
-        // Second request: Fetching specialty data
+        // Deuxième requête : Récupérer les collaborateurs actifs et inactifs
+        axios.get('http://localhost:3000/statactive')
+            .then(response => {
+                const { activeCount, nonActiveCount } = response.data.data;
+                setTotalcolabActive(activeCount);
+                setTotalcolabNonActive(nonActiveCount);
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des données", error);
+            });
+
+        // Troisième requête : Récupérer les données de spécialité
         axios.get('http://localhost:3000/colaborateurspecialte').then(response => {
             setSpecialtyData(response.data.data);
         });
 
-        // Third request: Fetching service data
+        // Quatrième requête : Récupérer les données de service
         axios.get('http://localhost:3000/applicationspecialte').then(response => {
             setServiceData(response.data.data);
         });
     }, []);
 
-    
-    
-    
-
-
-
     const cardData = [
-        { title: 'Total Users', number: totalUsers },
-        { title: 'Total Collaborators', number: totalCollaborators },
-        { title: 'Active Collaborators', number: totalcolabAcitve },
-        { title: 'Non-Active Collaborators', number: totalcolabNonAcitve },
+        { title: 'Utilisateurs Totals', number: totalUsers },
+        { title: 'Collaborateurs Totals', number: totalCollaborators },
+        { title: 'Collaborateurs Actifs', number: totalcolabActive },
+        { title: 'Collaborateurs Inactifs', number: totalcolabNonActive },
     ];
 
-    // Data for charts
+    // Données pour les graphiques
     const pieChartData = serviceData.map(item => ({
         title: item.service ,
         number: item.count,
@@ -73,7 +67,7 @@ const Dashboard = () => {
         labels: specialtyData.map(item => item.specialty),
         datasets: [
             {
-                label: "Number of Employees per Site",
+                label: "Nombre de collaborateur  par Specialite",
                 data: specialtyData.map(item => item.count),
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -86,7 +80,7 @@ const Dashboard = () => {
         labels: pieChartData.map(item => item.title),
         datasets: [
             {
-                label: 'distribution de services par spécialité.',
+                label: 'Répartition des services par spécialité',
                 data: pieChartData.map(item => item.number),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -111,7 +105,7 @@ const Dashboard = () => {
         labels: employeeData.map(item => item.title),
         datasets: [
             {
-                label: "Number of Employees per Company",
+                label: "Nombre de collaborateur  par Specialite",
                 data: employeeData.map(item => item.number),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -136,7 +130,7 @@ const Dashboard = () => {
         plugins: {
             title: {
                 display: true,
-                text: 'SIM Distribution',
+                text: 'Répartition des SIM',
                 font: {
                     size: 18,
                 },
@@ -160,7 +154,7 @@ const Dashboard = () => {
         plugins: {
             title: {
                 display: true,
-                text: "Number of Employees per Site",
+                text: "Nombre de collaborateur  par Specialite",
                 font: {
                     size: 20,
                 },
@@ -202,7 +196,7 @@ const Dashboard = () => {
                     <Card>
                         <CardContent>
                             <Typography variant="h6" component="div">
-                               collab par specialite 
+                                Collaborateurs par Spécialité
                             </Typography>
                             <div style={{ width: '100%', height: '300px' }}>
                                 <Pie data={pieData2} options={pieOptions} />
@@ -214,22 +208,10 @@ const Dashboard = () => {
                     <Card>
                         <CardContent>
                             <Typography variant="h6" component="div">
-                                Number of Employees per Site
+                                Nombre d'Employés par Site
                             </Typography>
                             <div style={{ width: '100%', height: '300px' }}>
                                 <Bar data={barData} options={barOptions} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12}>
-                    <Card>
-                        <CardContent>
-                            <Typography variant="h6" component="div">
-                                SIM Distribution
-                            </Typography>
-                            <div style={{ width: '100%', height: '600px' }}>
-                                <Bar data={pieData1} options={barOptions} />
                             </div>
                         </CardContent>
                     </Card>
